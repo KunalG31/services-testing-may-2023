@@ -3,6 +3,12 @@ namespace ProductsApi.Demo;
 
 public class DemoController : ControllerBase
 {
+    private readonly ISystemClock _clock;
+
+    public DemoController(ISystemClock clock)
+    {
+        _clock = clock;
+    }
 
     [HttpGet("/demo")]
     public async Task<ActionResult> GetTheDemo()
@@ -10,8 +16,21 @@ public class DemoController : ControllerBase
         var response = new DemoResponse
         {
             Message = "Hello from the Api!",
-            CreatedAt = DateTimeOffset.Now
+            CreatedAt = _clock.GetCurrent()
         };
         return Ok(response);
+    }
+}
+
+public interface ISystemClock
+{
+    DateTimeOffset GetCurrent();
+}
+
+public class SystemClock : ISystemClock
+{
+    public DateTimeOffset GetCurrent()
+    {
+        return DateTimeOffset.Now;
     }
 }
