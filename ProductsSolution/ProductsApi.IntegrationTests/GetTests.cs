@@ -12,7 +12,8 @@ public class GetTests
         var expectedResponse = new DemoResponse
         {
             Message = "Hello from the Api!",
-            CreatedAt = new DateTimeOffset(new DateTime(1969, 4, 20, 23, 59, 00), TimeSpan.FromHours(-4))
+            CreatedAt = new DateTimeOffset(new DateTime(1969, 4, 20, 23, 59, 00), TimeSpan.FromHours(-4)),
+            GettingCloseToQuittingTime = true
         };
 
         await using var host = await AlbaHost.For<Program>(options =>

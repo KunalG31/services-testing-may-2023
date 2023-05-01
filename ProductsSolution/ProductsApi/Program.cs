@@ -1,5 +1,6 @@
 using ProductsApi.Demo;
 
+// CreateBuilder adds the "standard" good defaults for EVERYTHING
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,7 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ISystemClock, SystemClock>();
+// 198 services
+builder.Services.AddSingleton<ISystemClock, SystemClock>(); // + 1
 
 var app = builder.Build();
 
