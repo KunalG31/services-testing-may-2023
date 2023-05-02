@@ -1,3 +1,4 @@
+using ProductsApi.Adapters;
 using ProductsApi.Demo;
 
 // CreateBuilder adds the "standard" good defaults for EVERYTHING
@@ -21,6 +22,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// new way - can actually replace defining controller.
+app.MapGet("/demo", (ISystemClock clock) =>
+{
+    var currentTime = clock.GetCurrent();
+    var response = new DemoResponse
+    {
+        Message = "Hello from the Api!",
+        CreatedAt = currentTime,
+        GettingCloseToQuittingTime = currentTime.Hour >= 16
+    };
+    return Results.Ok(response);
+});
 
 app.UseAuthorization();
 
