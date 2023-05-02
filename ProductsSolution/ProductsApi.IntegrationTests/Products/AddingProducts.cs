@@ -15,11 +15,11 @@ public class AddingProducts
         {
             options.ConfigureServices((context, sp) =>
             {
-                sp.AddScoped<IGenerateSlugs>(sp =>
+                sp.AddScoped<ICheckForUniqueValues>(sp =>
                 {
-                    var stubbedSlugThing = new Mock<IGenerateSlugs>();
-                    stubbedSlugThing.Setup(s => s.GenerateSlugForAsync(It.IsAny<string>())).ReturnsAsync("blammo");
-                    return stubbedSlugThing.Object;
+                    var stubbedUniqueChecker = new Mock<ICheckForUniqueValues>();
+                    stubbedUniqueChecker.Setup(u => u.IsUniqueAsync(It.IsAny<string>())).ReturnsAsync(true);
+                    return stubbedUniqueChecker.Object;
                 });
             });
         });
@@ -37,7 +37,7 @@ public class AddingProducts
 
         var expectedResponse = new CreateProductResponse
         {
-            Slug = "blammo",
+            Slug = "super-deluxe-dandruff-shampoo",
             Pricing = new ProductPricingInformation
             {
                 Retail = 42.23M,

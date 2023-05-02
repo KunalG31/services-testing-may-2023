@@ -16,7 +16,11 @@ builder.Services.AddSwaggerGen();
 // 198 services
 builder.Services.AddSingleton<ISystemClock, SystemClock>(); // + 1
 builder.Services.AddScoped<IManageTheProductCatalog, ProductManager>();
-builder.Services.AddScoped<IGenerateSlugs, SlugGenerator>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IGenerateSlugs, SlugGenerator>();
+    builder.Services.AddScoped<ICheckForUniqueValues, ProductSlugUniquenessChecker>();
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
