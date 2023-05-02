@@ -1,3 +1,4 @@
+using Marten;
 using ProductsApi.Adapters;
 using ProductsApi.Demo;
 using ProductsApi.Products;
@@ -21,6 +22,18 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddScoped<IGenerateSlugs, SlugGenerator>();
     builder.Services.AddScoped<ICheckForUniqueValues, ProductSlugUniquenessChecker>();
 }
+
+var productsConnectionString = builder.Configuration.GetConnectionString("products") ?? throw new ArgumentNullException("Need a connection string for the products data base");
+
+builder.Services.AddMarten(options =>
+{
+    options.Connection(productsConnectionString);
+    if (builder.Environment.IsDevelopment())
+    {
+        options.AutoCreateSchemaObjects = Weasel.Core.AutoCreate.All;
+    }
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

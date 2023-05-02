@@ -1,5 +1,7 @@
 ﻿
 using Alba;
+using LamarCodeGeneration.Frames;
+using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using ProductsApi.Products;
@@ -9,12 +11,17 @@ namespace ProductsApi.IntegrationTests.Products;
 public class AddingProducts
 {
     [Fact]
-    public async Task TacoSalad()
+    public async Task CreatingAProduct()
     {
+        var mockedDocumentSession = new Mock<IDocumentSession>();
         await using var host = await AlbaHost.For<Program>(options =>
         {
             options.ConfigureServices((context, sp) =>
             {
+                sp.AddScoped<IDocumentSession>(sp =>
+                {
+                    return mockedDocumentSession.Object;
+                });
                 sp.AddScoped<ICheckForUniqueValues>(sp =>
                 {
                     var stubbedUniqueChecker = new Mock<ICheckForUniqueValues>();
@@ -45,10 +52,8 @@ public class AddingProducts
                 {
                     Wholesale = 40.23M,
                     MinimumPurchaseRequired = 10
-
                 }
             }
-
         };
         var response = await host.Scenario(api =>
         {
@@ -60,5 +65,8 @@ public class AddingProducts
         Assert.NotNull(actualResponse);
 
         Assert.Equal(expectedResponse, actualResponse);
+
+        mockedDocumentSession.Verify(s => s.Insert(It.IsAny<CreateProductResponse>()), Times.Once);
+        mockedDocumentSession.Verify(s => s.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
     }
 }
