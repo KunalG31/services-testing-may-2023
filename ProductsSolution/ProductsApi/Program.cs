@@ -17,11 +17,9 @@ builder.Services.AddSwaggerGen();
 // 198 services
 builder.Services.AddSingleton<ISystemClock, SystemClock>(); // + 1
 builder.Services.AddScoped<IManageTheProductCatalog, ProductManager>();
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddScoped<IGenerateSlugs, SlugGenerator>();
-    builder.Services.AddScoped<ICheckForUniqueValues, ProductSlugUniquenessChecker>();
-}
+
+builder.Services.AddScoped<IGenerateSlugs, SlugGenerator>();
+builder.Services.AddScoped<ICheckForUniqueValues, ProductSlugUniquenessChecker>();
 
 var productsConnectionString = builder.Configuration.GetConnectionString("products") ?? throw new ArgumentNullException("Need a connection string for the products data base");
 

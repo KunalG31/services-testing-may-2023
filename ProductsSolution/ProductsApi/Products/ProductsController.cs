@@ -13,6 +13,13 @@ public class ProductsController : ControllerBase
         _productCatalog = productCatalog;
     }
 
+    [HttpGet("/products")]
+    public async Task<ActionResult> GetAllProducts()
+    {
+        IList<CreateProductResponse> response = await _productCatalog.GetAllAsync();
+        return Ok(response);
+    }
+
     [HttpPost("/products")]
     public async Task<ActionResult<CreateProductResponse>> AddProduct([FromBody] CreateProductRequest request)
     {

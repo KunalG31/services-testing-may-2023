@@ -35,6 +35,11 @@ public class ProductManager : IManageTheProductCatalog
         return response;
     }
 
+    public async Task<IList<CreateProductResponse>> GetAllAsync()
+    {
+        return await _session.Query<CreateProductResponse>().ToListAsync() as IList<CreateProductResponse>;
+    }
+
     public async Task<CreateProductResponse?> GetProductAsync(string slug)
     {
         var response = await _session.Query<CreateProductResponse>().Where(p => p.Slug == slug).SingleOrDefaultAsync();
