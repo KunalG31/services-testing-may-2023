@@ -6,11 +6,13 @@ public class ProductManager : IManageTheProductCatalog
 {
     private readonly IGenerateSlugs _slugGenerator;
     private readonly IDocumentSession _session;
+    private readonly IManagePricing _pricingManager;
 
-    public ProductManager(IGenerateSlugs slugGenerator, IDocumentSession session)
+    public ProductManager(IGenerateSlugs slugGenerator, IDocumentSession session, IManagePricing pricingManager)
     {
         _slugGenerator = slugGenerator;
         _session = session;
+        _pricingManager = pricingManager;
     }
 
     public async Task<CreateProductResponse> AddProductAsync(CreateProductRequest request)
@@ -18,17 +20,7 @@ public class ProductManager : IManageTheProductCatalog
         var response = new CreateProductResponse
         {
             Slug = await _slugGenerator.GenerateSlugForAsync(request.Name),
-            Pricing = new ProductPricingInformation
-            {
-                Retail = 42.23M,
-                Wholesale = new ProductPricingWholeInformation
-                {
-                    Wholesale = 40.23M,
-                    MinimumPurchaseRequired = 10
-
-                }
-            }
-
+            Pricing = await _pricingManager.GetPricingInformationForAsync(request.Supplier)
         };
         _session.Insert(response);
         await _session.SaveChangesAsync();
