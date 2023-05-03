@@ -20,7 +20,7 @@ public class ProductManager : IManageTheProductCatalog
         var response = new CreateProductResponse
         {
             Slug = await _slugGenerator.GenerateSlugForAsync(request.Name),
-            Pricing = await _pricingManager.GetPricingInformationForAsync(request.Supplier)
+            Pricing = await _pricingManager.GetPricingInformationForAsync(request)
         };
         _session.Insert(response);
         await _session.SaveChangesAsync();

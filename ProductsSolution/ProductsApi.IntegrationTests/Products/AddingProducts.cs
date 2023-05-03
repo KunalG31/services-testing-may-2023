@@ -2,16 +2,17 @@
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using ProductsApi.Adapters;
 using ProductsApi.IntegrationTests.Products.Fixtures;
 using ProductsApi.Products;
 
 namespace ProductsApi.IntegrationTests.Products;
 
 // Note: There is also a "ICollectionFixture" 
-public class AddingProducts : IClassFixture<ProductsDatabaseFixture>
+public class AddingProducts : IClassFixture<AddingProductsFixture>
 {
     private readonly IAlbaHost _host;
-    public AddingProducts(ProductsDatabaseFixture fixture)
+    public AddingProducts(AddingProductsFixture fixture)
     {
         _host = fixture.AlbaHost;
     }
@@ -68,5 +69,26 @@ public class AddingProducts : IClassFixture<ProductsDatabaseFixture>
         });
         var lookupResponseProduct = savedResonse.ReadAsJson<CreateProductResponse>();
         Assert.Equal(expectedResponse, lookupResponseProduct);
+    }
+}
+
+public class AddingProductsFixture : ProductsDatabaseFixture
+{
+    protected override void ConfigureAdditionalServices(IServiceCollection services)
+    {
+        //            Id = "bobs-shop",
+        // SKU = "19891"
+        var stubbedResponse = new SupplierPricingInformationResponse
+        {
+            AllowWholesale = false,
+            RequiredMsrp = 42.23M
+
+        };
+        var stubbedProductsApiAdapter = new Mock<PricingApiAdapter>(null);
+        stubbedProductsApiAdapter.Setup(a => a.GetThePricingInformationAsync("bobs-shop", "19891"))
+            .ReturnsAsync(stubbedResponse);
+
+        services.AddScoped<PricingApiAdapter>(sp => stubbedProductsApiAdapter.Object);
+
     }
 }

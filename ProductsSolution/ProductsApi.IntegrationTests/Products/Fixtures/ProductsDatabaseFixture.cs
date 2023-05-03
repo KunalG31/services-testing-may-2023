@@ -4,6 +4,9 @@ using DotNet.Testcontainers.Containers;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.PostgreSql;
 using Marten;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ProductsApi.IntegrationTests.Products.Fixtures;
 
@@ -32,6 +35,7 @@ public class ProductsDatabaseFixture : IAsyncLifetime
         {
             builder.ConfigureServices(services =>
             {
+                ConfigureAdditionalServices(services);
                 services.AddMarten(options =>
                 {
                     var connectionString = _pgContainer.GetConnectionString();
@@ -41,9 +45,16 @@ public class ProductsDatabaseFixture : IAsyncLifetime
         });
     }
 
+    protected virtual void ConfigureAdditionalServices(IServiceCollection services)
+    {
+        //
+    }
+
     public async Task DisposeAsync()
     {
         await AlbaHost.DisposeAsync();
         await _pgContainer.DisposeAsync().AsTask();
     }
+
+    
 }

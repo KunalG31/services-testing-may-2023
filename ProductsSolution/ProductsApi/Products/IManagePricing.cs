@@ -2,5 +2,5 @@
 
 public interface IManagePricing
 {
-    Task<ProductPricingInformation> GetPricingInformationForAsync(SupplierInformation supplier);
+    Task<ProductPricingInformation> GetPricingInformationForAsync(CreateProductRequest supplier);
 }
