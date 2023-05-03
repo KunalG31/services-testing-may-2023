@@ -5,16 +5,21 @@ using Moq;
 using ProductsApi.Adapters;
 using ProductsApi.IntegrationTests.Products.Fixtures;
 using ProductsApi.Products;
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
+using WireMock.Server;
 
 namespace ProductsApi.IntegrationTests.Products;
 
 // Note: There is also a "ICollectionFixture" 
-public class AddingProducts : IClassFixture<AddingProductsFixture>
+public class AddingProducts : IClassFixture<ProductsDatabaseFixture>
 {
     private readonly IAlbaHost _host;
-    public AddingProducts(AddingProductsFixture fixture)
+    private readonly WireMockServer _mockServer;
+    public AddingProducts(ProductsDatabaseFixture fixture, WireMockServer mockServer)
     {
         _host = fixture.AlbaHost;
+        _mockServer = mockServer;
     }
 
     [Fact]
@@ -23,7 +28,7 @@ public class AddingProducts : IClassFixture<AddingProductsFixture>
         var request = new CreateProductRequest
         {
             Name = "Super Deluxe Dandruff Shampoo",
-            Cost = 120.88M,
+            Cost = 18,
             Supplier = new SupplierInformation
             {
                 Id = "bobs-shop",
@@ -39,12 +44,24 @@ public class AddingProducts : IClassFixture<AddingProductsFixture>
                 Retail = 42.23M,
                 Wholesale = new ProductPricingWholeInformation
                 {
-                    Wholesale = 40.23M,
-                    MinimumPurchaseRequired = 10
+                    Wholesale = 32.04M,
+                    MinimumPurchaseRequired = 5
                 }
             }
 
         };
+
+        _mockServer.Given(Request.Create().WithPath($"/suppliers/{request.Supplier.Id}/products/{request.Supplier.SKU}"))
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithBodyAsJson(new SupplierPricingInformationResponse
+                {
+                    AllowWholesale = true,
+                    RequiredMsrp = 42.23M
+                }
+            ));
+
+
         var response = await _host.Scenario(api =>
         {
             api.Post.Json(request).ToUrl("/products");
