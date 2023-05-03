@@ -19,7 +19,6 @@ public class AddingProducts : IClassFixture<ProductsDatabaseFixture>
     [Fact]
     public async Task CreatingAProduct()
     {
-
         var request = new CreateProductRequest
         {
             Name = "Super Deluxe Dandruff Shampoo",

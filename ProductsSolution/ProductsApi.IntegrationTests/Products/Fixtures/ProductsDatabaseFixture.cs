@@ -20,7 +20,7 @@ public class ProductsDatabaseFixture : IAsyncLifetime
         .WithDatabase("products_dev")
         .WithUsername("user")
         .WithPassword("password")
-        .WithPortBinding(5432, 5432)
+        //.WithPortBinding(5432, 5432) // Don't do this because you'll have multiple running.
         .WithImage(PG_IMAGE)
         .Build();
     }
@@ -34,7 +34,8 @@ public class ProductsDatabaseFixture : IAsyncLifetime
             {
                 services.AddMarten(options =>
                 {
-                    options.Connection(_pgContainer.GetConnectionString());
+                    var connectionString = _pgContainer.GetConnectionString();
+                    options.Connection(connectionString);
                 });
             });
         });
@@ -43,6 +44,6 @@ public class ProductsDatabaseFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await AlbaHost.DisposeAsync();
-        await _pgContainer.DisposeAsync();
+        await _pgContainer.DisposeAsync().AsTask();
     }
 }
